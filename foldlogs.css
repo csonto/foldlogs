@@ -1,0 +1,113 @@
+.fold.expanded > .folded {
+  display: none;
+}
+.fold.expanded > .unfolded {
+  display: inline;
+}
+.fold.expanded {
+  transition: all 0s linear 0s; /* no delays for clicking. Do work only when clicking on expanded fold. :-/ */
+}
+
+.fold.collapsed {
+  position: relative !important;
+}
+
+.fold.collapsed > .folded {
+  display: inline;
+  background-color: #eef;
+  color: #00f;
+  text-decoration: underline;
+}
+
+.fold.collapsed > .folded:hover {
+  color: #f00;
+}
+
+.fold.collapsed:hover > .folded {
+}
+
+.fold.collapsed > .unfolded {
+  visibility: hidden;
+  opacity: 0;
+  top: -9999em; /* move element out of display to prevent space past the end of content */
+
+  transition: all 0.7s linear 0.6s, top 0s step-end 1.4s; /* 0.5s fade out after 0.6s delay, move the element only after opacity/visibility transitions are over */
+
+  display: inline-block !important;
+
+  position: absolute;
+  z-index: 10;
+  left: 2em; /* 0px; */
+
+  padding: 5px;
+  background-color: #ccc;
+  box-shadow: 2px 2px 4px #777;
+
+  /* TODO: having limited size of window would be useful, but overflow: auto
+   * crops the children as well :-/ */
+  /* overflow: auto; */
+}
+
+.fold.collapsed:hover > .unfolded {
+  visibility: visible;
+  opacity: 1;
+  top: 1em; /* move the element here */
+
+  transition: all 0.5s linear 0.6s, top 0s step-start 0s; /* 0.5s fade in after 0.6s delay, move the element here immediately */
+}
+
+.fold.collapsed.level2 > .unfolded, .fold.collapsed.level4 > .unfolded {
+  background-color: #999;
+  box-shadow: 2px 2px 4px #444;
+}
+
+.fold.expanded {
+  border-left: thin solid #777;
+  padding-left: 0.2em;
+}
+
+.fold.expanded:hover {
+  border-left: thin solid #f00;
+}
+
+.fold.collapsed:hover > .folder .lines {
+  color: #f00; /* highlight closed fold mouse is over */
+}
+
+.lines {
+  color: #777;
+  font-size: smaller;
+}
+
+.fold.expanded > .folder .lines {
+  display: none;
+}
+
+.fold.small .folded, .fold.small .folder .lines {
+  display: none;
+}
+
+.error {
+  background-color: red;
+}
+.warning {
+  color: red;
+}
+
+.highlighted {
+  background-color: yellow;
+}
+
+.search {
+  /* font-style: italic; */
+  text-decoration: underline;
+  background-color: #0f0;
+}
+
+.button {
+  display: inline-block;
+  padding: 2px;
+  border: thin solid black;
+  border-radius: 5px;
+}
+

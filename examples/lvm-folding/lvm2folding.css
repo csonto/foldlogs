@@ -1,0 +1,14 @@
+.header {
+  font-weight: bold;
+  font-size: larger;
+}
+.command {
+  font-weight: bold;
+}
+.debug {
+  color: #777;
+}
+.clvmd {
+  color: #733;
+}
+
