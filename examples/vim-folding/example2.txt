@@ -1,0 +1,86 @@
+== Showcase Folding with Explicit Fold Levels ==
+
+Like in Vim folds can be created at any level (1 up to 9) when marker `{{{` or
+`}}}` is followed by a number. This works pretty well as you can see:
+
+Tiny fold {{{1
+  This tiny fold is not even created
+}}}1 End of tiny fold.
+
+Few more lines are needed:
+Larger fold {{{1
+  level1
+  level1
+  level1
+}}}1 End of larger fold
+
+Nested fold {{{1
+  level1
+  {{{2
+    level2
+    level2
+    level2
+  }}}2
+  level1
+  level1
+  {{{2
+    level2
+    level2
+    level2
+  }}}2
+  level1
+  level1
+}}}1 End of nested fold
+
+=== Let's try some mismatched levels ===
+Starting with higher level:
+{{{3
+level3
+level3
+level3
+}}}3
+level2
+}}}2
+level1
+}}}1
+
+{{{1
+level1
+{{{2
+level2
+{{{3
+level3
+level3
+level3
+level3
+}}}1
+...and closing all open folds here ^
+
+{{{1
+level1
+{{{2
+level2
+{{{3
+level3
+skipping to level 5 {{{5
+level5
+level5
+}}}9 - ignored. Level 9 was not open
+still level5
+...and now closing levels by opening new lower level fold {{{2
+level2
+level2
+level2
+level2
+...and starting a new level1 fold {{{1
+new level1
+new level1
+new level1
+}}}1
+
+...and a last level without closing marker {{{1
+level1 kept open
+level1 kept open
+level1 kept open
+level1 kept open
+level1 kept open

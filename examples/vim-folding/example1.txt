@@ -1,0 +1,22 @@
+== Showcase Highlighting ==
+unfolded
+=== H2 ===
+unfolded
+==== H3 ====
+unfolded
+### H3
+unfolded
+## H2
+unfolded
+
+# Showcase Folding
+Tiny fold {{{
+  This tiny fold is not even created
+}}} End of tiny fold.
+
+Few more lines are needed:
+Larger fold {{{
+  level1
+  level1
+  level1
+}}} End of larger fold

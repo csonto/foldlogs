@@ -1,0 +1,23 @@
+== Nesting Showcase ==
+
+Nesting does not work (yet.)
+If nested contexts are created `{{{` matches the start `.re` for all of them.
+And first `}}}` encountered closes them all.
+
+Nested fold {{{
+  level1
+  {{{
+    level2
+    level2
+    level2
+  }}}
+  level1
+  level1
+  {{{
+    level2
+    level2
+    level2
+  }}}
+  level1
+  level1
+}}} End of nested fold
