@@ -24,7 +24,8 @@ var id_n = 1;
 // TODO: this depends on formatting and should be a injected {
 // TODO: which is faster?
 var toggle1 = function(event) {
-  debug && console.log("id clicked", ni);
+  var e = $(this);
+  debug && console.log("id clicked", e);
   event.stopPropagation();
   $(this).toggleClass("expanded collapsed");
   //$(this).children(".folded").toggle();
