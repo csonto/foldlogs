@@ -59,8 +59,8 @@ var hlDebug = function(line) {
   });
   return hlNone(line);
 };
-var hlLvmetadIn = function(line) {
-  if (line.match(/-&gt; reason = /) || (line.match(/-&gt; response = /) && !line.match(/-&gt; response = "OK"/))) {
+var hlDaemonIn = function(line) {
+  if (line.match(/-&gt; reason = /) || (line.match(/-&gt; response = "(?!OK")/))) {
     return hlLine(hlNone(line), "warning");
   }
   return hlNone(line);
@@ -68,7 +68,35 @@ var hlLvmetadIn = function(line) {
 var hlClvmd = function(line) {
   return hlNone(line);
 };
+var _a_link = function(href, text) {
+  var link = "[[<a href='"+href+"'>"+(text || href)+"</a>]]";
+  return link;
+};
+var bz_link = function(m, id, comment, text) {
+  // https://bugzilla.redhat.com/show_bug.cgi?id=1212590#c1
+  var c = comment || "";
+  return _a_link("https://bugzilla.redhat.com/show_bug.cgi?id="+id+c, text ? text.slice(1) : "Bug "+id+c);
+};
+var git_commit = function(m, commit, text) {
+  // https://git.fedorahosted.org/cgit/lvm2.git/commit/?id=3fc9615d156892efd8bb28b0306c2fe9c14738ff
+  return _a_link("https://git.fedorahosted.org/cgit/lvm2.git/commit/?id="+commit, text ? text.slice(1) : "Commit "+commit);
+};
+var a_link = function(m, href, text) {
+  return _a_link(href, text ? text.slice(1) : href);
+};
+var lvm2links = function(m, link) {
+  if (link.match(/^bz:\d+(?:#c\d+)?(?:|.*)?$/)) {
+    return link.replace(/^bz:(\d+)(#c\d+)?(|.*)?$/, bz_link);
+  };
+  if (link.match(/^commit:[0-9a-fA-F]+(?:|.*)?$/)) {
+    return link.replace(/^commit:([0-9a-fA-F]+)(|.*)?$/, git_commit);
+  };
+  return link.replace(/^([^|\[\]]+)(|.*)?$/, a_link);
+};
 var hlNone = function(line) {
+  if (line.match(/\[\[[^\]\[]+\]\]/)) {
+    line = line.replace(/\[\[([^\]\[]+)\]\]/g, lvm2links);
+  }
   if (line.match(/STACKTRACE|SKIP_THIS_TEST|&lt;backtrace&gt;|[fF]ailed|[fF]ailure|&lt;[123]&gt;\[\d+\.\d+\]|Segmentation fault|general protection/)) {
     return hlLine(line, "error any");
   }
@@ -84,15 +112,29 @@ var hlNone = function(line) {
   return hlLine(line, "any");
 };
 
-var lvmetad_re = test_re(/^\[[ 0-9]\d:\d\d\] (&lt;-|-&gt;|pv_clear_all$|pv_gone: \(.*\) \/ \d+|vg_lookup: uuid = |vg_lookup: updated uuid = |pv_found .*, vgid = |locking VG|unlocking VG)/);
+// FIXME:
+// lvmetad: pv_gone, token_update, pv_clear_all, pv_list, vg_lookup, pv_found, vg_update
+// lvmpolld: hello, pvmove, progress_info
+// var lvmpolld_re = test_re(/^(?:\[[ 0-9]\d:\d\d\] \)(?:&lt;-|-&gt;/);
+// <- request="hello"
+// ...
+// -> $
+// >= request="pvmove"
+// ...
+// -> $
+// >= request="progress_info"
+// ...
+// -> $
+// /^(?:\[[ 0-9]\d:\d\d\] \)(&lt;- request="(?:pvmove|progress_info)"|-&gt;\|LVMPOLLD: \)/;
+var daemon_re = test_re(/^(?:\[[ 0-9]\d:\d\d\] |)(?:&lt;-|-&gt;|pv_clear_all$|pv_gone: \(.*\) \/ \d+|vg_lookup: uuid = |vg_lookup: updated uuid = |pv_found .*, vgid = |locking VG|unlocking VG|LVMPOLLD: )/);
 
 var lvm2context = function(id, element) { return [base_context(
   id,
   [
-    {"re": test_re(/^\[[ 0-9]\d:\d\d\] CLVMD\[/),               "id": "_clvmd",       "class": "clvmd",       "highlight": hlClvmd,      "next": []},
-    {"re": lvmetad_re,                                          "id": "_lvmetad",     "class": "lvmetad",     "highlight": hlNone,       "next": [
-    {"re": test_re(/^\[[ 0-9]\d:\d\d\] &lt;- /),                "id": "_out",         "class": "lvmetad_out", "highlight": hlNone,       "next": []},
-    {"re": test_re(/^\[[ 0-9]\d:\d\d\] -&gt; /),                "id": "_in",          "class": "lvmetad_in",  "highlight": hlLvmetadIn,  "next": []},
+    {"re": test_re(/^(?:\[[ 0-9]\d:\d\d\] |)CLVMD\[/),          "id": "_clvmd",       "class": "clvmd",       "highlight": hlClvmd,      "next": []},
+    {"re": daemon_re,                                           "id": "_daemon",      "class": "daemon",      "highlight": hlNone,       "next": [
+    {"re": test_re(/^(?:\[[ 0-9]\d:\d\d\] |)&lt;- /),           "id": "_out",         "class": "daemon_out",  "highlight": hlNone,       "next": []},
+    {"re": test_re(/^(?:\[[ 0-9]\d:\d\d\] |)-&gt; /),           "id": "_in",          "class": "daemon_in",   "highlight": hlDaemonIn,   "next": []},
     ]},
     /*
     {"re": test_re(/^\[[ 0-9]\d:\d\d\] lvm.conf {{{/),          "id": "_cfg",         "class": "cfg",         "highlight": hlCfg,        "next": [
