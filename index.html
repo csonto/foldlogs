@@ -1,14 +1,67 @@
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="foldlogs.css"/>
+  <link rel="stylesheet" type="text/css" href="examples/vim-folding/vim-folding.css"/>
+  <style type="text/css">
+  /* override the defaults here */
+  .toplevel {
+    background-color: #eee;
+    border: thin #ccc solid;
+    padding: 20px;
+  }
+  .toplevel > .status {
+    font-family: sans-serif;
+    font-size: x-small;
+    color: #777;
+  }
+  .toplevel > pre {
+    background-color: #fff;
+    border: thin #000 solid;
+    padding: 5px;
+  }
+  </style>
+  <script src="examples/lib/arg-1.3.1.min.js" type="text/javascript"></script>
+  <script src="examples/lib/jquery-2.1.3.min.js" type="text/javascript"></script>
+  <!--script src="contrib/jquery-2.1.3.js" type="text/javascript"></script-->
+  <!--script src="contrib/line-navigator.min.js" type="text/javascript"></script-->
+  <script src="foldlogs.js" type="text/javascript"></script>
+  <script src="examples/vim-folding/vim-folding.js" type="text/javascript"></script>
+  <!--
+  <script src="ranges.js" type="text/javascript"></script>
+  -->
+</head>
 <body>
-
-<h2>Examples:</h2>
-
-<h3>LVM folding</h3>
+<h1>FoldLogs - Highlight and Fold Logs</h1>
+<p>
+JavaScript library for folding and highlighting logfiles.
+</p><p>
+This is based on regular expressions, folding
+<ul>
+  <li>all lines matching an expressions (<code>.re</code>)
+  <li>or range of lines matching from a start (<code>.re</code>) to an end (<code>.re_end</code>) when
+      <code>.re_end</code> is defined.
+</ul>
+Each fold may have its own <code>.class</code> or <code>.highlight</code> and can be expanded by default
+(<code>.collapsed</code>).
+</p><p>
+An example is worth a thousand words. Here's one inspired by Vim's markers folding:
+</p>
+<div class="toplevel" id="logfile1"></div>
+<p>
+More <a href="examples/vim-folding/all.html">Vim inspired examples</a>.
+</p>
+<h3>LVM testsuite output folding</h3>
 
 <p>
-Folding and highlighting output of LVM2 testsuite:
+More complex and lengthy example - folding and highlighting output of LVM2 testsuite:
 </p>
 
 <li>Shorter 10k line long <a href="examples/lvm-folding/lvm2folding.html?f=20160114/ndev-lvmetad%3Ashell_lvconvert-repair-raid.sh.txt">log file</a>
 <li>And <a href="examples/lvm-folding/lvm2folding.html?f=20160114/ndev-lvmetad%3Ashell_lvconvert-raid456.sh.txt">longer one</a>  (50k lines) demonstrating how slow the reading/parsing/building the DOM can be. Limit the number of lines you want to display. I will try to optimize it.
 
+<script type="text/javascript">
+build_folding("logfile1", "", "examples/vim-folding/example1.txt", function(pi, p) {return vim_context(pi, p, 1);});
+</script>
 </body>
+</html>
