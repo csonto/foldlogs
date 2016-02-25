@@ -391,24 +391,32 @@ var folding_nav = function(navid, topid, results) {
 * URL arguments processing
 \******************************************************************************/
 
+var proc_href = function(url) {
+  var a = document.createElement("a");
+  a.href = url;
+  if (a.host == "") {
+    a.href = a.href; // relative to absolute
+  }
+  return a;
+};
+
 var proc_url = function(url, defaults, f) {
   var args = {};
-  var _url = url || window.location.toString();
+  var _url = url ? (url._href ? url : proc_href(url)) : window.location;
 
   var u, p;
   if (window.urlObject) {
-    var u = urlObject(_url);
+    var u = urlObject(_url.toString());
   }
   if (u) {
     p = u.parameters;
   } else if (window.Arg) {
-    p = Arg.parse(_url);
+    p = Arg.parse(_url.search.substring(1));
     if (!p) {
       alert("No parameters object found...")
       p = {};
     };
-    var i = _url.indexOf("#");
-    u = {"hash": _url.substring(i+1), "parameters": p};
+    u = {"hash": _url.hash.substring(1), "parameters": p};
   } else {
     alert("Missing urlObject or Arg for parsing URL.");
     p = {};
