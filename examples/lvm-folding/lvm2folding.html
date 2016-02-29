@@ -22,32 +22,14 @@
   -->
 </head>
 <body onload="javascript:unfolding_jump();">
-  <div id="logfile">
-    <a id="origin" href="">original file</a>
-    <div id="logfilenav"></div>
-    <pre id="logfilepre"></pre>
-    <div id="logfilenav2"></div>
-    <div id="logfilestat">Loading file...</div>
-    <div><pre id="results"></pre></div>
-  </div>
+  <div id="logfile"></div>
   <script type="text/javascript">
 
 var url_args = proc_url(null, {}, "20160114/ndev-lvmetad:shell_lvconvert-raid456.sh.txt");
 var args = proc_args(url_args, 38000);
 
-var stat = function(s) { $("#highlightstat").html(s); };
-
-var ts = Date.now();
-
-$("#origin").attr("href", args.f);
-
 var my_load = function(f) {
-  return $.get(args.f, function(data) {
-    var lines = data.split("\n");
-    $("#logfilestat").html('File obtained in '+(Date.now()-ts)+'ms. <div id="highlightstat"/>');
-
-    highlight_tail(lines, 40000, 32000, lvm2context("logfilepre", $("#logfilepre")), stat);
-  }, "text");
+  build_folding("logfile", undefined, f, lvm2context);
 };
 
 var relative = function(a, b) {
@@ -58,18 +40,15 @@ $.getJSON("lvm2files2.json", function (d) {
   file2Prefix = d; // JSON.parse(d);
   $.getJSON(relative(args.f, "build.json"), function (d) {
     buildMeta = d;
-    my_load();
+    my_load(args.f);
   }).fail(function (e) {
     console.error(e);
-    my_load();
+    my_load(args.f);
   });
 }).fail(function (e) {
   console.error(e);
-  my_load();
+  my_load(args.f);
 });
-
-folding_nav("logfilenav", "logfilepre", $("#results"));
-folding_nav("logfilenav2", "logfilepre", $("#results"));
 
 if ('onhashchange' in window) {
   window.onhashchange = unfolding_jump;

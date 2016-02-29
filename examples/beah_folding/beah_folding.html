@@ -22,17 +22,11 @@
   <script src="beah_folding.js" type="text/javascript"></script>
 </head>
 <body onload="javascript:unfolding_jump();">
-  <form>
-    <input id="log"/><input type="button" value="load" id="load"/>
+  <form id="loader">
+    <input id="log" size="80" />
+    <input type="submit" value="Load" />
   </form>
-  <div id="logfile">
-    <a id="origin" href="">original file</a>
-    <div id="logfilenav"></div>
-    <pre id="logfilepre"></pre>
-    <div id="logfilenav2"></div>
-    <div id="logfilestat">Loading file...</div>
-    <div><pre id="results"></pre></div>
-  </div>
+  <div id="logfile"></div>
   <script type="text/javascript">
 
 var url_args = proc_url(null, {}, "test_inputs/beah_console.log");
@@ -40,33 +34,25 @@ var args = proc_args(url_args, 38000);
 // TODO: test args processing:
 //console.log(args);
 
-var stat = function(s) { $("#highlightstat").html(s); };
-
-var ts = Date.now();
-
 var my_load = function(f) {
-  return $.get(f, function(data) {
-    var lines = data.split("\n");
-    $("#logfilestat").html('File obtained in '+(Date.now()-ts)+'ms. <div id="highlightstat"/>');
-
-    highlight(lines, undefined, undefined, beah_context("logfilepre", $("#logfilepre")), stat);
-  }, "text");
+  build_folding("logfile", undefined, f, beah_context, function(lines, context, stat) {
+    highlight(lines, undefined, undefined, context, stat);
+  });
 };
 
+$("#log").val(args.f);
 my_load(args.f);
 
-folding_nav("logfilenav", "logfilepre", $("#results"));
-folding_nav("logfilenav2", "logfilepre", $("#results"));
+$("#loader").submit(function(event) {
+  // TODO: update the URL with f= and null the hash part of URL
+  // MAYBE: should the f itself contain hash? search string? ...?
+  my_load($("#log").val());
+  event.preventDefault();
+});
 
 if ('onhashchange' in window) {
   window.onhashchange = unfolding_jump;
 }
-
-$("#load").click(function() {
-  // TODO: update the URL with f= and null the hash part of URL
-  // MAYBE: should the f itself contain hash? search string? ...?
-  my_load($("#log").val());
-});
 
   </script>
 </body>
