@@ -13,9 +13,10 @@ var beah_re = test_re(/(beah|backend|rhts_task) [^ ]+: INFO |^\]\) *$|^\[-- MARK
 
 var hlNone = function(line) {
   if (beah_re(line)) {
-    return hlLine(line, "beah");
+    return hlLine(line, "beah any");
   }
-  return line;
+  /* NOTE: Only lines matching ".any" are searched :-/ */
+  return hlLine(line, "any");
 };
 
 /*
