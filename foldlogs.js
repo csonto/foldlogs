@@ -139,7 +139,7 @@ var _close_context = function(n, cn) {
 
 var close_all_contexts = function(n, context) {
   if (context.length > 1) {
-    console.warning("Not all contexts were closed. Popping them...");
+    console.warn("Not all contexts were closed. Popping them...");
     cn = context.pop();
     _close_context(n, cn);
     debug && console.log("pop", cn);
@@ -391,24 +391,32 @@ var folding_nav = function(navid, topid, results) {
 * URL arguments processing
 \******************************************************************************/
 
+var proc_href = function(url) {
+  var a = document.createElement("a");
+  a.href = url;
+  if (a.host == "") {
+    a.href = a.href; // relative to absolute
+  }
+  return a;
+};
+
 var proc_url = function(url, defaults, f) {
   var args = {};
-  var _url = url || window.location.toString();
+  var _url = url ? (url._href ? url : proc_href(url)) : window.location;
 
   var u, p;
   if (window.urlObject) {
-    var u = urlObject(_url);
+    var u = urlObject(_url.toString());
   }
   if (u) {
     p = u.parameters;
   } else if (window.Arg) {
-    p = Arg.parse(_url);
+    p = Arg.parse(_url.search.substring(1));
     if (!p) {
       alert("No parameters object found...")
       p = {};
     };
-    var i = _url.indexOf("#");
-    u = {"hash": _url.substring(i+1), "parameters": p};
+    u = {"hash": _url.hash.substring(1), "parameters": p};
   } else {
     alert("Missing urlObject or Arg for parsing URL.");
     p = {};
@@ -501,33 +509,39 @@ var proc_args = function(args, lines) {
   return args;
 };
 
-var build_folding = function(topid, header, file, context_builder) {
+
+var build_folding = function(topid, header, file, context_builder, proc) {
   var top = $("#"+topid);
-  top.append(header);
+  top.text("");
+  if (header) {
+    top.append(header);
+  }
   top.append("<a href='"+file+"'>Original file</a>");
-  top.append("<div id='"+topid+"nav'/>");
+  top.append("<div id='"+topid+"nav'>");
   var preid = topid + "pre";
-  var pre = $("<pre id='"+preid+"'/>");
+  var pre = $("<pre id='"+preid+"'>");
   top.append(pre);
-  top.append("<div id='"+topid+"nav2'/>");
+  top.append("<div id='"+topid+"nav2'>");
   var s = $("<div class='status'>Loading file...</div>");
   top.append(s);
   var stat = function(str) { s.html(str); };
-  var r = $("<pre/>");
+  var r = $("<pre>");
   var dp = $("<div>");
   dp.append(r);
   top.append(dp);
   var context = context_builder(preid, pre);
 
+  var procf = proc || function(lines, context, stat) {
+    highlight_tail(lines, 40000, 32000, context, stat);
+  };
+
   $.get(file, function(data) {
     var lines = data.split("\n");
-    highlight_tail(lines, 40000, 32000, context, stat);
+    procf(lines, context, stat);
+
+    folding_nav(topid+"nav",  preid, r);
+    folding_nav(topid+"nav2", preid, r);
   }, "text").fail(function() {
     stat("Failed to load file "+file+".");
   });
-
-  folding_nav(topid+"nav",  preid, r);
-  folding_nav(topid+"nav2", preid, r);
-
 };
-

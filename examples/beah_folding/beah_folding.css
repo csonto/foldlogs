@@ -1,0 +1,20 @@
+.beah {
+  color: #999;
+}
+
+.fold.collapsed:hover > .unfolded {
+  background-color: #eee;
+  box-shadow: 2px 2px 4px #777;
+  /* TODO: need to implement line-wrapping */
+  /* max-width: 90%; */
+}
+/* TODO: this is wrong! It closes the unfolded section on mouse over!
+.fold.collapsed:hover > .unfolded:hover {
+  display: none;
+}
+*/
+.fold.collapsed.level2:hover > .unfolded, .fold.collapsed.level4:hover > .unfolded {
+  background-color: #ddd;
+  box-shadow: 2px 2px 4px #444;
+}
+
